@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  # docker take the container as connection and db name to connect with the app
+  postgres:
+    image: postgres:14.6-alpine
+    container_name: DB-e-commerce
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - DATABASE_HOST=localhost
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: DBM-e-commerce
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 80:80
+    depends_on:
+      - postgres
+
+  app:
+    image: node:16.19.0-alpine3.16
+    container_name: APP-e-commerce
+    restart: always
+    ports:
+      - 4000:4000
+    build: .
+    command: npm run start:dev
+    depends_on:
+      - pgadmin
